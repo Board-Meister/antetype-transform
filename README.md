@@ -1,2 +1,2 @@
-# module-skeleton
-Example module, to be reused when creating new common modules
+# antetype-transform
+A antetype module for transforming layers 
