@@ -1,5 +1,5 @@
 import type { Modules } from "@boardmeister/antetype";
-import type { IBaseDef } from "@boardmeister/antetype"
+import type { IBaseDef } from "@boardmeister/antetype-core"
 import { IInjected } from "@src/index";
 import { IFilter, IOpacity, IRotate } from "@src/type/actions.d";
 

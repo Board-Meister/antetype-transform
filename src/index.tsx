@@ -1,9 +1,11 @@
 import type { IInjectable, Module } from "@boardmeister/marshal"
 import type { Minstrel } from "@boardmeister/minstrel"
 import type { Herald, ISubscriber, Subscriptions  } from "@boardmeister/herald"
-import type { ModulesEvent, DrawEvent, IBaseDef, CalcEvent } from "@boardmeister/antetype"
+import type { DrawEvent, IBaseDef, CalcEvent } from "@boardmeister/antetype-core"
+import type { ModulesEvent } from "@boardmeister/antetype"
 import type Transformator from "@src/module";
-import { Event } from "@boardmeister/antetype"
+import { Event as AntetypeCoreEvent } from "@boardmeister/antetype-core"
+import { Event as AntetypeEvent } from "@boardmeister/antetype"
 
 export interface IInjected extends Record<string, object> {
   minstrel: Minstrel;
@@ -81,8 +83,8 @@ export class AntetypeTransform {
   }
 
   static subscriptions: Subscriptions = {
-    [Event.MODULES]: 'register',
-    [Event.DRAW]: [
+    [AntetypeEvent.MODULES]: 'register',
+    [AntetypeCoreEvent.DRAW]: [
       {
         method: 'setTransform',
         priority: -255
@@ -92,7 +94,7 @@ export class AntetypeTransform {
         priority: 255
       }
     ],
-    [Event.CALC]: {
+    [AntetypeCoreEvent.CALC]: {
       method: 'condition',
       priority: -254,
     },
