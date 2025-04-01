@@ -24,21 +24,25 @@ interface RegisterConfig {
 		src: string;
 	};
 }
-type Module = Record<string, unknown>;
+declare class CModule<T = any> {
+	constructor(...args: unknown[]);
+	inject?: (injections: T) => void;
+}
+type Module<T = any> = CModule<T> | Record<string, unknown>;
 interface IModuleImportObject {
-	default?: Module | React$1.FC | ((...args: unknown[]) => void);
+	default?: Module | ((...args: unknown[]) => void);
 }
 interface IModuleImport {
 	config: RegisterConfig;
 	module: IModuleImportObject | (() => Promise<Module>);
 }
-declare class _IInjectable {
+declare class _IInjectable<T = object> {
 	constructor(...args: unknown[]);
-	inject(injections: Record<string, object>): void;
+	inject(injections: T): void;
 	scope?(): Record<string, unknown>;
 	static inject: Record<string, string>;
 }
-type IInjectable = typeof _IInjectable;
+type IInjectable<T> = typeof _IInjectable<T>;
 declare class Marshal {
 	static version: string;
 	renderCount: number;
@@ -46,7 +50,7 @@ declare class Marshal {
 	loaded: Record<string, object>;
 	tagMap: Record<string, IModuleImport[]>;
 	scope: Record<string, unknown>;
-	instanceMap: WeakMap<Module, RegisterConfig>;
+	instanceMap: WeakMap<Module<any>, RegisterConfig>;
 	constructor();
 	addScope(name: string, value: unknown): void;
 	render(): void;
@@ -135,57 +139,11 @@ declare class Minstrel {
 	component<T>(module: Module, suffix: string, scope?: Record<string, any>): React$1.FC<T>;
 	asset(module: Module, suffix: string): string;
 }
-interface DrawEvent {
-	element: IBaseDef;
-}
-interface CalcEvent {
-	element: IBaseDef | null;
-}
-declare type XValue = number;
-declare type YValue = XValue;
-interface IStart {
-	x: XValue;
-	y: YValue;
-}
-interface ISize {
-	w: XValue;
-	h: YValue;
-}
-interface IArea {
-	size: ISize;
-	start: IStart;
-}
-interface IHierarchy {
-	parent: IParentDef | null;
-	position: number;
-}
-interface IBaseDef<T = never> {
-	[key: symbol | string]: unknown;
-	hierarchy?: IHierarchy;
-	start: IStart;
-	size: ISize;
-	type: string;
-	can?: {
-		move?: boolean;
-		scale?: boolean;
-		remove?: boolean;
-	};
-	area?: IArea;
-	data?: T;
-}
-interface IParentDef extends IBaseDef {
-	layout: Layout;
-}
-type Layout = (IBaseDef | IParentDef)[];
 interface ModulesEvent {
-	modules: Modules;
+	modules: Record<string, Module$1>;
 	canvas: HTMLCanvasElement | null;
 }
-interface Module$1 {
-}
-interface Modules {
-	[key: string]: Module$1 | undefined;
-}
+declare type Module$1 = object;
 export interface IInjected extends Record<string, object> {
 	minstrel: Minstrel;
 	herald: Herald;
@@ -209,12 +167,9 @@ export declare class AntetypeTransform {
 	};
 	inject(injections: IInjected): void;
 	register(event: CustomEvent<ModulesEvent>): Promise<void>;
-	condition(event: CustomEvent<CalcEvent>): void;
-	setTransform(event: CustomEvent<DrawEvent>): void;
-	restoreTransform(event: CustomEvent<DrawEvent>): void;
 	static subscriptions: Subscriptions;
 }
-declare const EnAntetypeTransform: IInjectable & ISubscriber;
+declare const EnAntetypeTransform: IInjectable<IInjected> & ISubscriber;
 
 export {
 	EnAntetypeTransform as default,

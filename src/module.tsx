@@ -1,28 +1,92 @@
-import type { Modules } from "@boardmeister/antetype";
-import type { IBaseDef } from "@boardmeister/antetype-core"
-import { IInjected } from "@src/index";
 import { IFilter, IOpacity, IRotate } from "@src/type/actions.d";
+import type { Herald  } from "@boardmeister/herald"
+import type { DrawEvent, IBaseDef, Module, CalcEvent } from "@boardmeister/antetype-core"
+import { Event as AntetypeCoreEvent } from "@boardmeister/antetype-core"
+import { ITransform } from ".";
+
+declare type Modules = Record<string, Module>;
 
 export default class Transformator {
   #canvas: HTMLCanvasElement;
   // @ts-expect-error TS6133: '#modules' is declared but its value is never read.
   #modules: Modules;
   #ctx: CanvasRenderingContext2D;
-  // @ts-expect-error TS6133: '#injected' is declared but its value is never read.
-  #injected: IInjected;
+  #herald: Herald;
 
   constructor(
     canvas: HTMLCanvasElement|null,
     modules: Modules,
-    injected: IInjected,
+    herald: Herald,
   ) {
     if (!canvas) {
       throw new Error('[Antetype Illustrator] Provided canvas is empty')
     }
+
     this.#canvas = canvas;
     this.#modules = modules;
-    this.#injected = injected;
     this.#ctx = this.#canvas.getContext('2d')!;
+    this.#herald = herald;
+  }
+
+  registerEvents(): void {
+    const unregister = this.#herald.batch([
+      {
+        event: AntetypeCoreEvent.CLOSE,
+        subscription: () => {
+          unregister();
+        }
+      },
+      {
+        event: AntetypeCoreEvent.DRAW,
+        subscription: [
+          {
+            method: (event: CustomEvent<DrawEvent>): void => {
+                const { element } = event.detail;
+                if (typeof element.transform != 'object') {
+                  return;
+                }
+
+                const transform = element.transform as ITransform;
+                const typeToAction: Record<string, (transform: ITransform, layer: IBaseDef) => void> = {
+                  rotate: this.rotate.bind(this),
+                  opacity: this.opacity.bind(this),
+                  filter: this.filter.bind(this),
+                };
+
+                this!.save();
+                const el = typeToAction[transform.type] ?? null;
+                if (typeof el == 'function') {
+                  el(transform, element);
+                }
+              },
+            priority: -255
+          },
+          {
+            method: (event: CustomEvent<DrawEvent>): void => {
+              const { element } = event.detail;
+              if (typeof element.transform != 'object') {
+                return;
+              }
+              this.restore();
+            },
+            priority: 255
+          }
+        ]
+      },
+      {
+        event: AntetypeCoreEvent.CALC,
+        subscription: {
+          priority: -254,
+          method:(event: CustomEvent<CalcEvent>): void => {
+            const { element } = event.detail;
+            if (element?.draw === false) {
+              event.detail.element = null;
+              event.stopPropagation();
+            }
+          }
+        }
+      }
+    ])
   }
 
   save(): void {
