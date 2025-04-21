@@ -19,7 +19,7 @@
     "baseUrl": ".",
     "paths": {
       "@src/*": ["src/*"],
-      "@component/*": ["src/component/*"]
+      "@type/*": ["src/type/*"]
     },
     "allowJs": true
   },

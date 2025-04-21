@@ -2,7 +2,7 @@ import type { IInjectable, Module } from "@boardmeister/marshal"
 import type { Minstrel } from "@boardmeister/minstrel"
 import type { Herald, ISubscriber, Subscriptions  } from "@boardmeister/herald"
 import type { ModulesEvent } from "@boardmeister/antetype-core"
-import type Transformator from "@src/module";
+import type Transformer from "@src/module";
 import { Event as AntetypeCoreEvent } from "@boardmeister/antetype-core"
 
 export interface IInjected extends Record<string, object> {
@@ -24,7 +24,7 @@ export interface ITransform<T = any> {
  */
 export class AntetypeTransform {
   #injected?: IInjected;
-  #module: (typeof Transformator)|null = null;
+  #module: (typeof Transformer)|null = null;
 
   static inject = {
     minstrel: 'boardmeister/minstrel',

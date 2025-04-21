@@ -1,8 +1,25 @@
 // ../antetype-core/dist/index.js
-var s = ((t) => (t.INIT = "antetype.init", t.CLOSE = "antetype.close", t.DRAW = "antetype.draw", t.CALC = "antetype.calc", t.RECALC_FINISHED = "antetype.recalc.finished", t.MODULES = "antetype.modules", t.SETTINGS = "antetype.settings.definition", t))(s || {});
+var o = { INIT: "antetype.init", CLOSE: "antetype.close", DRAW: "antetype.draw", CALC: "antetype.calc", RECALC_FINISHED: "antetype.recalc.finished", MODULES: "antetype.modules", SETTINGS: "antetype.settings.definition", TYPE_DEFINITION: "antetype.layer.type.definition" };
+var i = class {
+  #e;
+  #n = null;
+  static inject = { minstrel: "boardmeister/minstrel", herald: "boardmeister/herald" };
+  inject(e) {
+    this.#e = e;
+  }
+  async #t(e, n) {
+    let t = this.#e.minstrel.getResourceUrl(this, "core.js");
+    return this.#n = (await import(t)).default, this.#n({ canvas: n, modules: e, herald: this.#e.herald });
+  }
+  async register(e) {
+    let { modules: n, canvas: t } = e.detail;
+    n.core = await this.#t(n, t);
+  }
+  static subscriptions = { [o.MODULES]: "register" };
+};
 
-// src/module.tsx
-var Transformator = class {
+// src/module.ts
+var Transformer = class {
   #canvas;
   // @ts-expect-error TS6133: '#modules' is declared but its value is never read.
   #modules;
@@ -20,13 +37,13 @@ var Transformator = class {
   registerEvents() {
     const unregister = this.#herald.batch([
       {
-        event: s.CLOSE,
+        event: o.CLOSE,
         subscription: () => {
           unregister();
         }
       },
       {
-        event: s.DRAW,
+        event: o.DRAW,
         subscription: [
           {
             method: (event) => {
@@ -61,7 +78,7 @@ var Transformator = class {
         ]
       },
       {
-        event: s.CALC,
+        event: o.CALC,
         subscription: {
           priority: -254,
           method: (event) => {
@@ -101,5 +118,5 @@ var Transformator = class {
   }
 };
 export {
-  Transformator as default
+  Transformer as default
 };

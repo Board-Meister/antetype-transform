@@ -79,7 +79,7 @@ declare class _ISubscriber {
 }
 type ISubscriber = typeof _ISubscriber;
 type AmbiguousSubscription = string | Subscription | Subscription[] | EventHandler;
-type EventHandler = (event: CustomEvent) => Promise<void> | void;
+type EventHandler = (event: CustomEvent) => Promise<any> | any;
 type Subscriptions = Record<string, AmbiguousSubscription>;
 interface Subscription {
 	method: string | EventHandler;
@@ -98,9 +98,9 @@ interface IEventRegistration {
 	sort?: boolean;
 	symbol?: symbol | null;
 }
-interface IInjection extends Record<string, object> {
+interface IInjection extends Record<string, object | undefined> {
 	subscribers: ISubscriberObject[];
-	marshal: Marshal;
+	marshal?: Marshal;
 }
 declare class Herald {
 	#private;

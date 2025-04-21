@@ -6,7 +6,7 @@ import { ITransform } from ".";
 
 declare type Modules = Record<string, Module>;
 
-export default class Transformator {
+export default class Transformer {
   #canvas: HTMLCanvasElement;
   // @ts-expect-error TS6133: '#modules' is declared but its value is never read.
   #modules: Modules;
