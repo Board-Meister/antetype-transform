@@ -1,5 +1,5 @@
 // ../antetype-core/dist/index.js
-var o = { INIT: "antetype.init", CLOSE: "antetype.close", DRAW: "antetype.draw", CALC: "antetype.calc", RECALC_FINISHED: "antetype.recalc.finished", MODULES: "antetype.modules", SETTINGS: "antetype.settings.definition", TYPE_DEFINITION: "antetype.layer.type.definition" };
+var o = { INIT: "antetype.init", CLOSE: "antetype.close", DRAW: "antetype.draw", CALC: "antetype.calc", RECALC_FINISHED: "antetype.recalc.finished", MODULES: "antetype.modules", SETTINGS: "antetype.settings.definition", TYPE_DEFINITION: "antetype.layer.type.definition", FONTS_LOADED: "antetype.font.loaded" };
 var i = class {
   #e;
   #n = null;
@@ -48,20 +48,22 @@ var Transformer = class {
           {
             method: (event) => {
               const { element } = event.detail;
-              if (typeof element.transform != "object") {
+              if (!Array.isArray(element.transforms)) {
                 return;
               }
-              const transform = element.transform;
+              const transforms = element.transforms;
               const typeToAction = {
                 rotate: this.rotate.bind(this),
                 opacity: this.opacity.bind(this),
                 filter: this.filter.bind(this)
               };
-              this.save();
-              const el = typeToAction[transform.type] ?? null;
-              if (typeof el == "function") {
-                el(transform, element);
-              }
+              this.#save();
+              transforms.forEach((transform) => {
+                const el = typeToAction[transform.type] ?? null;
+                if (typeof el == "function") {
+                  el(transform, element);
+                }
+              });
             },
             priority: -255
           },
@@ -71,31 +73,18 @@ var Transformer = class {
               if (typeof element.transform != "object") {
                 return;
               }
-              this.restore();
+              this.#restore();
             },
             priority: 255
           }
         ]
-      },
-      {
-        event: o.CALC,
-        subscription: {
-          priority: -254,
-          method: (event) => {
-            const { element } = event.detail;
-            if (element?.draw === false) {
-              event.detail.element = null;
-              event.stopPropagation();
-            }
-          }
-        }
       }
     ]);
   }
-  save() {
+  #save() {
     this.#ctx.save();
   }
-  restore() {
+  #restore() {
     this.#ctx.restore();
   }
   rotate(transform, layer) {

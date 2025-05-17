@@ -141,7 +141,7 @@ declare class Minstrel {
 }
 interface ModulesEvent {
 	modules: Record<string, Module$1>;
-	canvas: HTMLCanvasElement | null;
+	canvas: HTMLCanvasElement;
 }
 declare type Module$1 = object;
 export interface IInjected extends Record<string, object> {
@@ -149,7 +149,7 @@ export interface IInjected extends Record<string, object> {
 	herald: Herald;
 }
 export interface ITransform<T = any> {
-	type: "string";
+	type: string;
 	data: T;
 }
 /**

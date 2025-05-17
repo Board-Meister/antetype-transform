@@ -1,6 +1,6 @@
 import { IFilter, IOpacity, IRotate } from "@src/type/actions.d";
 import type { Herald  } from "@boardmeister/herald"
-import type { DrawEvent, IBaseDef, Module, CalcEvent } from "@boardmeister/antetype-core"
+import type { DrawEvent, IBaseDef, Module } from "@boardmeister/antetype-core"
 import { Event as AntetypeCoreEvent } from "@boardmeister/antetype-core"
 import { ITransform } from ".";
 
@@ -42,22 +42,24 @@ export default class Transformer {
           {
             method: (event: CustomEvent<DrawEvent>): void => {
                 const { element } = event.detail;
-                if (typeof element.transform != 'object') {
+                if (!Array.isArray(element.transforms)) {
                   return;
                 }
 
-                const transform = element.transform as ITransform;
+                const transforms = element.transforms as ITransform[];
                 const typeToAction: Record<string, (transform: ITransform, layer: IBaseDef) => void> = {
                   rotate: this.rotate.bind(this),
                   opacity: this.opacity.bind(this),
                   filter: this.filter.bind(this),
                 };
 
-                this!.save();
-                const el = typeToAction[transform.type] ?? null;
-                if (typeof el == 'function') {
-                  el(transform, element);
-                }
+                this.#save();
+                transforms.forEach(transform => {
+                  const el = typeToAction[transform.type] ?? null;
+                  if (typeof el == 'function') {
+                    el(transform, element);
+                  }
+                });
               },
             priority: -255
           },
@@ -67,33 +69,20 @@ export default class Transformer {
               if (typeof element.transform != 'object') {
                 return;
               }
-              this.restore();
+              this.#restore();
             },
             priority: 255
           }
         ]
       },
-      {
-        event: AntetypeCoreEvent.CALC,
-        subscription: {
-          priority: -254,
-          method:(event: CustomEvent<CalcEvent>): void => {
-            const { element } = event.detail;
-            if (element?.draw === false) {
-              event.detail.element = null;
-              event.stopPropagation();
-            }
-          }
-        }
-      }
     ])
   }
 
-  save(): void {
+  #save(): void {
     this.#ctx.save();
   }
 
-  restore(): void {
+  #restore(): void {
     this.#ctx.restore();
   }
 

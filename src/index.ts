@@ -11,7 +11,7 @@ export interface IInjected extends Record<string, object> {
 }
 
 export interface ITransform<T = any> {
-  type: 'string';
+  type: string;
   data: T;
 }
 
