@@ -2,7 +2,7 @@ import { IFilter, IOpacity, IRotate } from "@src/type/actions.d";
 import type { Herald  } from "@boardmeister/herald"
 import type { DrawEvent, IBaseDef, Module } from "@boardmeister/antetype-core"
 import { Event as AntetypeCoreEvent } from "@boardmeister/antetype-core"
-import { ITransform } from ".";
+import type { ITransform } from "@src/type/type.d";
 
 declare type Modules = Record<string, Module>;
 

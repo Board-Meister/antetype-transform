@@ -1,5 +1,5 @@
 import type { ICore } from "@boardmeister/antetype-core";
-import Core from "@boardmeister/antetype-core/dist/core";
+import { Core } from "@boardmeister/antetype-core";
 import { Herald } from "@boardmeister/herald";
 import Transformer from "@src/module";
 
