@@ -5,3 +5,5 @@ import Transformer from "@src/module";
 export {
   Transformer,
 };
+
+export { ID, VERSION } from "@src/module.conf";

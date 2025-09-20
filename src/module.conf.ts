@@ -2,8 +2,11 @@ import type { IInjectable, Module } from "@boardmeister/marshal"
 import type { Herald, ISubscriber, Subscriptions  } from "@boardmeister/herald"
 import type { ModulesEvent } from "@boardmeister/antetype-core"
 import type Transformer from "@src/module";
-import { Event as AntetypeCoreEvent } from "@boardmeister/antetype-core"
 import type Marshal from "@boardmeister/marshal";
+import { Event as AntetypeCoreEvent } from "@boardmeister/antetype-core"
+
+export const ID = 'transform';
+export const VERSION = '0.0.4';
 
 export interface IInjected extends Record<string, object> {
   herald: Herald;
@@ -29,13 +32,20 @@ export class AntetypeTransform {
     this.#injected = injections;
   }
 
-  async register(event: CustomEvent<ModulesEvent>): Promise<void> {
-    const { modules, canvas } = event.detail;
-    if (!this.#module) {
-      const module = this.#injected!.marshal.getResourceUrl(this as Module, 'module.js');
-      this.#module = (await import(module)).default;
-    }
-    modules.transform = new this.#module!(canvas, modules, this.#injected!.herald);
+  register(event: ModulesEvent): void {
+    const { registration } = event.detail;
+
+    registration[ID] = {
+      load: async () => {
+        if (!this.#module) {
+          const module = this.#injected!.marshal.getResourceUrl(this as Module, 'module.js');
+          this.#module = ((await import(module)) as { default: typeof Transformer }).default;
+        }
+
+        return (modules, canvas) => new this.#module!(canvas, modules, this.#injected!.herald);
+      },
+      version: VERSION,
+    };
   }
 
   static subscriptions: Subscriptions = {

@@ -1,6 +1,6 @@
 {
   "name": "@boardmeister/antetype-transform",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "An antetype module for transforming layers",
   "type": "module",
   "main": "dist/index.js",
@@ -53,7 +53,7 @@
     "typescript-eslint": "^8.0.1"
   },
   "dependencies": {
-    "@boardmeister/antetype-core": "^0.0.3",
+    "@boardmeister/antetype-core": "^0.0.5",
     "@boardmeister/herald": "^0.0.1",
     "@boardmeister/marshal": "^0.0.2"
   }
