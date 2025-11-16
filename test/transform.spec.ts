@@ -8,8 +8,9 @@ describe('Transformer is', () => {
   const herald = new Herald();
   const canvas = document.createElement('canvas');
   beforeEach(() => {
-    core = Core({ herald, canvas }) as ICore;
-    transformer = new Transformer(canvas, { core }, herald );
+    core = Core({ herald }) as ICore;
+    transformer = new Transformer({ core }, herald );
+    core.meta.setCanvas(canvas);
   });
 
   it('properly rotating, changing opacity and setting filter', async () => {

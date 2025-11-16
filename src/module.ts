@@ -5,24 +5,14 @@ import { Event as AntetypeCoreEvent } from "@boardmeister/antetype-core"
 import type { ITransform } from "@src/type/type.d";
 
 export default class Transformer {
-  #canvas: HTMLCanvasElement;
-  // @ts-expect-error TS6133: '#modules' is declared but its value is never read.
   #modules: Modules;
-  #ctx: CanvasRenderingContext2D;
   #herald: Herald;
 
   constructor(
-    canvas: HTMLCanvasElement|null,
     modules: Modules,
     herald: Herald,
   ) {
-    if (!canvas) {
-      throw new Error('[Antetype Illustrator] Provided canvas is empty')
-    }
-
-    this.#canvas = canvas;
     this.#modules = modules;
-    this.#ctx = this.#canvas.getContext('2d')!;
     this.#herald = herald;
   }
 
@@ -76,23 +66,32 @@ export default class Transformer {
     ])
   }
 
+  #ctx(): CanvasRenderingContext2D|OffscreenCanvasRenderingContext2D {
+    const canvas = this.#modules.core!.meta.getCanvas();
+    if (!canvas) {
+      throw new Error('[Antetype Transform] Provided canvas is empty')
+    }
+
+    return canvas.getContext('2d')!;
+  }
+
   #save(): void {
-    this.#ctx.save();
+    this.#ctx().save();
   }
 
   #restore(): void {
-    this.#ctx.restore();
+    this.#ctx().restore();
   }
 
   rotate(transform: IRotate, layer: IBaseDef): void {
     const { start: { x,y }, size: { w,h } } = layer;
-    this.#ctx.translate(x + w/2, y + h/2);
-    this.#ctx.rotate((transform.data.degree * Math.PI) / 180);
-    this.#ctx.translate(-(x + w/2), -(y + h/2));
+    this.#ctx().translate(x + w/2, y + h/2);
+    this.#ctx().rotate((transform.data.degree * Math.PI) / 180);
+    this.#ctx().translate(-(x + w/2), -(y + h/2));
   }
 
   opacity(transform: IOpacity): void {
-    this.#ctx.globalAlpha = transform.data.alpha;
+    this.#ctx().globalAlpha = transform.data.alpha;
   }
 
   /**
@@ -102,6 +101,6 @@ export default class Transformer {
    * @param transform
    */
   filter(transform: IFilter): void {
-    this.#ctx.filter = transform.data.filter;
+    this.#ctx().filter = transform.data.filter;
   }
 }

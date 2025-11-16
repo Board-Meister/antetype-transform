@@ -42,7 +42,7 @@ export class AntetypeTransform {
           this.#module = ((await import(module)) as { default: typeof Transformer }).default;
         }
 
-        return (modules, canvas) => new this.#module!(canvas, modules, this.#injected!.herald);
+        return modules => new this.#module!(modules, this.#injected!.herald);
       },
       version: VERSION,
     };
